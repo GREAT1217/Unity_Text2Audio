@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d7b715a2-b2f5-4a1a-bef6-b1ac3b349098" name="默认更改列表" comment="">
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Unity_Text2Audio/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Unity_Text2Audio/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Text2Audio.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Text2Audio.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -59,6 +59,7 @@
       <option name="presentableId" value="Default" />
       <updated>1602833007851</updated>
       <workItem from="1602833018062" duration="608000" />
+      <workItem from="1602834017533" duration="1585000" />
     </task>
     <servers />
   </component>

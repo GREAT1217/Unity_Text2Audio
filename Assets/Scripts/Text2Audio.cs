@@ -52,7 +52,6 @@ public class Text2Audio : MonoBehaviour
     private void Start()
     {
         InitForm();
-        InitClient();
     }
 
     private void InitForm()
@@ -106,7 +105,7 @@ public class Text2Audio : MonoBehaviour
         _playBtn.onClick.AddListener(() => StartCoroutine(PlayAudioClip()));
 
         _savePath.text = Application.streamingAssetsPath;
-        _saveName.text = "audioclip1";
+        _saveName.text = "audioClip1";
         _saveType.options = new List<Dropdown.OptionData>() {new Dropdown.OptionData("wav"), new Dropdown.OptionData("mp3")};
         _saveBtn.onClick.AddListener(SaveAudioClip);
 
@@ -137,6 +136,18 @@ public class Text2Audio : MonoBehaviour
         var appId = _appId.text;
         var apiKey = _apiKey.text;
         var secretKey = _scretKey.text;
+        if (apiKey == "")
+        {
+            ShowDebug("【错误】apiKey不能为空！");
+            return;
+        }
+
+        if (secretKey == "")
+        {
+            ShowDebug("【错误】secretKey不能为空！");
+            return;
+        }
+
         _client = new Tts(apiKey, secretKey)
         {
             Timeout = 60000 //超时时间
@@ -175,7 +186,7 @@ public class Text2Audio : MonoBehaviour
         ShowDebug(null, true);
         LoadTextAsset();
 
-        StringBuilder sb = new StringBuilder("【显示格式】：\n文件名————文本（只显示前20个字符）\n【批量合成文本】：\n");
+        var sb = new StringBuilder("【显示格式】：\n文件名————文本（只显示前20个字符）\n【批量合成文本】：\n");
         foreach (var item in _textDict)
         {
             sb.Append(item.Key);
@@ -209,61 +220,39 @@ public class Text2Audio : MonoBehaviour
 
     private void SaveAudioClip()
     {
-        if (_batchMode)
+        var savePath = _savePath.text;
+        if (savePath == "")
         {
-            SaveMutipleAudioClips();
+            ShowDebug("【错误】保存地址为空！");
+            return;
+        }
+
+        if (!Directory.Exists(savePath))
+        {
+            Directory.CreateDirectory(savePath);
+        }
+
+        if (_batchMode.isOn)
+        {
+            StartCoroutine(SaveAudioClips(savePath));
         }
         else
         {
-            SaveSingleAudioClip();
+            var saveName = _saveName.text;
+            if (saveName == "")
+            {
+                ShowDebug("【错误】保存文件名为空！");
+                return;
+            }
+
+            var current = EventSystem.current;
+            current.enabled = false;
+            StartCoroutine(SaveAudioClip(_singleText.text, savePath, saveName));
+            current.enabled = true;
         }
     }
 
-    private void SaveSingleAudioClip()
-    {
-        var savePath = _savePath.text;
-        if (savePath == "")
-        {
-            ShowDebug("【错误】保存地址为空！");
-            return;
-        }
-
-        if (!Directory.Exists(savePath))
-        {
-            Directory.CreateDirectory(savePath);
-        }
-
-        var saveName = _saveName.text;
-        if (saveName == "")
-        {
-            ShowDebug("【错误】保存文件名为空！");
-            return;
-        }
-
-        var current = EventSystem.current;
-        current.enabled = false;
-        StartCoroutine(SaveAudioClip(_singleText.text, savePath, saveName));
-        current.enabled = true;
-    }
-
-    private void SaveMutipleAudioClips()
-    {
-        var savePath = _savePath.text;
-        if (savePath == "")
-        {
-            ShowDebug("【错误】保存地址为空！");
-            return;
-        }
-
-        if (!Directory.Exists(savePath))
-        {
-            Directory.CreateDirectory(savePath);
-        }
-
-        StartCoroutine(SaveAudioClip(savePath));
-    }
-
-    private IEnumerator SaveAudioClip(string savePath)
+    private IEnumerator SaveAudioClips(string savePath)
     {
         var current = EventSystem.current;
         current.enabled = false;
@@ -322,7 +311,7 @@ public class Text2Audio : MonoBehaviour
                 using (var outStream = new MemoryStream())
                 {
                     WaveFileWriter.WriteWavFileToStream(outStream, reader);
-                    _audioSource.clip = WavUtility.ToAudioClip(outStream.ToArray(), 0);
+                    _audioSource.clip = WavUtility.ToAudioClip(outStream.ToArray());
                 }
             }
         }
@@ -361,7 +350,6 @@ public class Text2Audio : MonoBehaviour
         {
             _synthesisResult = null;
             ShowDebug($"【错误】语音合成失败！错误代码：{result.ErrorCode}，错误信息：{result.ErrorMsg}。");
-            yield break;
         }
     }
 }
